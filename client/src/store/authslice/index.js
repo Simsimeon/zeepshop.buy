@@ -130,7 +130,6 @@ extraReducers: (builder)=>{
     }).addCase(checkAuth.fulfilled,(state,action)=>{
         state.isLoading =false;
         console.log(action);
-        
         state.user = action.payload !==undefined? action.payload.user:null;
         state.isAuthenticated = action.payload !==undefined ? true:false;;
     }).addCase(checkAuth.rejected,(state)=>{

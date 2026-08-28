@@ -28,8 +28,25 @@ function MenuItems({setOpen}){
     <nav className="mt-8 flex-col flex gap-2">
       {
        AdminSideBarMenuItems.map((menuItem)=><div key={menuItem.id} onClick={()=>{
-         setOpen(prev=>!prev)
         navigate(menuItem.path)
+         setOpen(prev=>!prev)
+        }} className="flex text-xl items-center gap-2 rounded-md px-3 py-2 text-muted-foreground cursor-pointer hover:bg-muted hover:text-foreground">
+         {menuItem.icons}
+         <span>{menuItem.label}</span>
+
+       </div>) 
+      }
+    </nav>
+  )
+}
+function MenuItem(){
+  const navigate= useNavigate()
+  return(
+    <nav className="mt-8 flex-col flex gap-2">
+      {
+       AdminSideBarMenuItems.map((menuItem)=><div key={menuItem.id} onClick={()=>{
+        navigate(menuItem.path)
+        
         }} className="flex text-xl items-center gap-2 rounded-md px-3 py-2 text-muted-foreground cursor-pointer hover:bg-muted hover:text-foreground">
          {menuItem.icons}
          <span>{menuItem.label}</span>
@@ -49,10 +66,10 @@ function AdminSideBar({open,setOpen}) {
           <SheetHeader className="border-b">
             <SheetTitle className="flex gap-2 mt-5 mb-5">
               <ChartNoAxesCombined size={30}/>
-                     <h1 className="text-2xl font-extrabold ">Admin Panel</h1>
+                     <p className="text-2xl font-extrabold ">Admin Panel</p>
               </SheetTitle>
           </SheetHeader>
-          <MenuItems setOpen={setOpen}/>
+          <MenuItems setOpen={setOpen} />
         </div>
 
       </SheetContent>
@@ -65,7 +82,7 @@ function AdminSideBar({open,setOpen}) {
         <h1 className="text-2xl font-extrabold ">Admin Panel
         </h1>
       </div>
-     <MenuItems />
+     <MenuItem/>
      </aside>
     </>
   )
