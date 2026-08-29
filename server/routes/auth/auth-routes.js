@@ -10,7 +10,9 @@ Route.post("/register",register);
 Route.post("/login",login);
 Route.post("/logout",logout);
 Route.get("/check",authMiddleware,async(req,res)=>{
-    const user = req.user;
+    const userToken = req.user;
+  const user = userToken.userInfo
+  
     res.status(200).json({
         message:"authenticated user",
         success:true,

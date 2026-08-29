@@ -1,0 +1,104 @@
+const { StatusCodes } = require("http-status-codes");
+const { imageUploadUtils } = require("../../helpers/cloudinary");
+const productModel = require("../../model/product.model");
+const { BadRequestError } = require("../../errors");
+
+async function handleImageUpload(req, res) {
+  try {
+    if (!req.file) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "Please upload an image file.",
+      });
+    }
+
+    const base64 = req.file.buffer.toString("base64");
+    const dataUrl = `data:${req.file.mimetype};base64,${base64}`;
+    const result = await imageUploadUtils(dataUrl);
+    console.log(result);
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      result,
+    });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: error.message || "Error occurred while uploading the image.",
+    });
+  }
+}
+async function addProduct(req, res) {
+  try {
+    const product = req.body
+    const productItem = await productModel.create({ product });
+    res.status(StatusCodes.CREATED).json({ 
+      success:true,
+     data: productItem,
+     });
+  
+  }catch(error){
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success:false,
+      message:"Error occurred "
+    })
+  }
+}
+
+async function fetchAllProduct (req,res){
+  try{
+    const getAllProduct = await productModel.find({});
+    res.status(StatusCodes.OK).json({
+      getAllProduct
+    })
+  }catch(error){
+   res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success:false,
+      message:"Error occurred "
+    })
+  }
+
+  }
+async function editProduct(req,res){
+  const {editProductId}=req.params
+  try{
+   const updatedProduct = await productModel.findOneAndUpdate(
+    {_id:editProductId},
+    req.body,
+    {
+       new:true,
+      runValidators:true,
+    }
+   ) 
+   if(!updatedProduct){
+    throw new BadRequestError(`No product with that id ${id}`)
+   }
+ res.status(StatusCodes.OK).json({
+  success:true,
+  data:updatedProduct
+ })
+
+  }catch(error){
+     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success:false,
+      message:"Error occurred "
+    })
+  }
+}
+async function deleteProduct (){
+  const {productId}=req.params
+  try{
+  const deletedProduct = await productModel.findOne({_id:productId});
+    await deletedProduct.remove()
+    res.status(StatusCodes.OK).json({
+      message:'Product deleted successfully',
+      success:true,
+    })
+  }catch(error){
+     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success:false,
+      message:"Error occurred "
+    })
+  }
+} 
+module.exports = { handleImageUpload, addProduct,deleteProduct,editProduct,fetchAllProduct };
