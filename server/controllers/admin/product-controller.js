@@ -2,6 +2,8 @@ const { StatusCodes } = require("http-status-codes");
 const { imageUploadUtils } = require("../../helpers/cloudinary");
 const productModel = require("../../model/product.model");
 const { BadRequestError } = require("../../errors");
+const { findOne } = require("../../model/user.model");
+const userModel = require("../../model/user.model");
 
 async function handleImageUpload(req, res) {
   try {
@@ -32,7 +34,10 @@ async function addProduct(req, res) {
   try {
     const productBody = req.body || {};
     const userId = req.user?.userInfo?.userId || req.user?._id || productBody.user;
-
+    const productCreator= await userModel.findOne({_id:userId});
+    const productCreatorName = productCreator.username
+    console.log(productCreatorName);
+    
     const productItem = await productModel.create({
       image: productBody.image,
       title: productBody.title,
@@ -43,6 +48,7 @@ async function addProduct(req, res) {
       salePrice: productBody.salePrice ? Number(productBody.salePrice) : undefined,
       totalStock: productBody.totalStock ?? productBody.total,
       user: userId,
+      productCreator:productCreatorName 
     });
 
     res.status(StatusCodes.CREATED).json({

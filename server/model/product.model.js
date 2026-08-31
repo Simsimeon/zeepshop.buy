@@ -35,6 +35,10 @@ const ProductSchema= new mongoose.Schema({
         ref:"User",
         required:true
     },
+ productCreator:{
+  type:String,
+  required:true
+ }   
 },{timestamps:true});
 
 
