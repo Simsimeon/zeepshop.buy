@@ -1,5 +1,3 @@
-import { LayoutDashboard, Package2, ShoppingBasket } from "lucide-react"
-
 export const registerFormControls =[
     {
         name:"username",
@@ -94,8 +92,8 @@ export const addProductFormElement =[
     placeholder:"Enter product sale price (optional)",
 },
 {
-    label:"Total",
-    name:"total",
+    label:"Total Stock",
+    name:"totalStock",
     componentType:"input",
     type:"number",
     placeholder:"Enter product's total stock",

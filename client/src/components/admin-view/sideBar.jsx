@@ -11,7 +11,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet"
     {
         id:"products",
         label:"Products",
-        path: "/admin/product",
+        path: "/admin/products",
         icons:<ShoppingBasket />
     },
     {

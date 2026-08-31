@@ -2,8 +2,11 @@ import CommonForm from "@/components/common/form";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { addProductFormElement } from "@/config";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { ProductImageUpload } from "./image-upload";
+import { useDispatch, useSelector } from "react-redux";
+import { addNewProduct, fetchAllProduct } from "@/store/product-slice";
+import { toast } from "@/components/ui/toast"
 const initialFormData={
   image:"",
   title:"",
@@ -19,11 +22,33 @@ export default function AdminProduct() {
   const [openCreateProductsDialog,setOpenCreateProductsDialog]=useState(false);
   const [imageFile,setImageFile]=useState(null);
   const [uploadedImageUrl,setUploadImageUrl]=useState("")
-  function onSubmit (){
-    console.log(`submitting`);
+  const [imageLoading,setImageLoading]=useState(false)
+  const dispatch =useDispatch();
+  const {products}=useSelector(state=>state.adminProducts);
+   
+  async function onSubmit (e){
+    e.preventDefault();
+   const response = await dispatch(addNewProduct({
+    ...formData,
+    image:uploadedImageUrl
+   }))
+   if(response?.payload?.success){
+      setImageFile(null);
+      setFormData(initialFormData);
+      dispatch(fetchAllProduct());
+      setOpenCreateProductsDialog(false)
+      toast.add({
+        title:"Product add successfully",
+
+      })
+   };
+   
+    // console.log(products.data,`submitting`);
     
   }
-  
+  useEffect(()=>{
+    dispatch(fetchAllProduct())
+  },[dispatch])
   
   return (
     <Fragment>
@@ -44,10 +69,13 @@ export default function AdminProduct() {
          </SheetTitle>
       </SheetHeader>
       <ProductImageUpload 
+      imageLoading={imageLoading}
+      setImageLoading={setImageLoading}
       file={imageFile} 
       setFile={setImageFile} 
       uploadedImageUrl={uploadedImageUrl} 
-      setUploadImageUrl={setUploadImageUrl}/>
+      setUploadImageUrl={setUploadImageUrl}
+      />
       <div className="py-6">
         <CommonForm
         formData={formData}

@@ -44,7 +44,7 @@ export default function App() {
                <AdminLayout/>
           </CheckAuth>}>
            <Route path="dashboard"  element={<AdminDashBoard/>}/>
-           <Route path="product"  element={<AdminProduct/>}/>
+           <Route path="products"  element={<AdminProduct/>}/>
            <Route path="order"  element={<AdminOrder/>}/>
            <Route path="feature"  element={<AdminFeatures/>}/>
         </Route>
