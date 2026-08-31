@@ -9,16 +9,16 @@ const authRouter = require("./routes/auth/auth-routes");
 const adminProductRouter = require("./routes/product/product-route")
 app.use(
     cors({
-        origin:"http://localhost:5173",
-        methods:['GET',"POST","PUT","DELETE"],
-        allowedHeaders:[
+        origin: "http://localhost:5173",
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: [
             "Content-Type",
             "Authorization",
             "Cache-Control",
             "Expires",
             "Pragma"
         ],
-        credentials:true 
+        credentials: true
     })
 )
 app.use(cookieParser(process.env.JWT_SECRET));

@@ -30,8 +30,8 @@ const ProductSchema= new mongoose.Schema({
   totalStock:{
     type:Number
  },
-user:{
-        type:mongooes.Types.ObjectId,
+ user:{
+        type:mongoose.Types.ObjectId,
         ref:"User",
         required:true
     },

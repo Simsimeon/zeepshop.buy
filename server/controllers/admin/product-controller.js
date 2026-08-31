@@ -15,7 +15,7 @@ async function handleImageUpload(req, res) {
     const base64 = req.file.buffer.toString("base64");
     const dataUrl = `data:${req.file.mimetype};base64,${base64}`;
     const result = await imageUploadUtils(dataUrl);
-    console.log(result);
+
 
     return res.status(StatusCodes.OK).json({
       success: true,
@@ -30,18 +30,32 @@ async function handleImageUpload(req, res) {
 }
 async function addProduct(req, res) {
   try {
-    const product = req.body
-    const productItem = await productModel.create({ product });
-    res.status(StatusCodes.CREATED).json({ 
-      success:true,
-     data: productItem,
-     });
-  
-  }catch(error){
+    const productBody = req.body || {};
+    const userId = req.user?.userInfo?.userId || req.user?._id || productBody.user;
+
+    const productItem = await productModel.create({
+      image: productBody.image,
+      title: productBody.title,
+      description: productBody.description,
+      category: productBody.category,
+      Brand: productBody.brand || productBody.Brand,
+      price: Number(productBody.price || 0),
+      salePrice: productBody.salePrice ? Number(productBody.salePrice) : undefined,
+      totalStock: productBody.totalStock ?? productBody.total,
+      user: userId,
+    });
+
+    res.status(StatusCodes.CREATED).json({
+      success: true,
+      data: productItem,
+    });
+  } catch (error) {
+    console.log(error.message, "error occurred");
+
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      success:false,
-      message:"Error occurred "
-    })
+      success: false,
+      message: error.message || "Error occurred while creating product",
+    });
   }
 }
 
@@ -49,7 +63,7 @@ async function fetchAllProduct (req,res){
   try{
     const getAllProduct = await productModel.find({});
     res.status(StatusCodes.OK).json({
-      getAllProduct
+     data:getAllProduct
     })
   }catch(error){
    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
