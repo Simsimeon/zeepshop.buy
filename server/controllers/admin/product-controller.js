@@ -36,7 +36,7 @@ async function addProduct(req, res) {
     const userId = req.user?.userInfo?.userId || req.user?._id || productBody.user;
     const productCreator= await userModel.findOne({_id:userId});
     const productCreatorName = productCreator.username
-    console.log(productCreatorName);
+
     
     const productItem = await productModel.create({
       image: productBody.image,
@@ -80,13 +80,13 @@ async function fetchAllProduct (req,res){
 
   }
 async function editProduct(req,res){
-  const {editProductId}=req.params
+  const {id}=req.params
   try{
    const updatedProduct = await productModel.findOneAndUpdate(
-    {_id:editProductId},
+    {_id:id},
     req.body,
     {
-       new:true,
+      new: true,
       runValidators:true,
     }
    ) 
@@ -105,11 +105,13 @@ async function editProduct(req,res){
     })
   }
 }
-async function deleteProduct (){
-  const {productId}=req.params
+async function deleteProduct (req, res){
+  const {id}=req.params
   try{
-  const deletedProduct = await productModel.findOne({_id:productId});
-    await deletedProduct.remove()
+  const deletedProduct = await productModel.findByIdAndDelete(id);
+    if(!deletedProduct){
+      throw new BadRequestError(`No product with that id ${id}`)
+    }
     res.status(StatusCodes.OK).json({
       message:'Product deleted successfully',
       success:true,

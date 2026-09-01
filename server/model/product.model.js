@@ -22,10 +22,11 @@ const ProductSchema= new mongoose.Schema({
   Brand:{type:String},
   price:{
   type:Number,
-    default:0
+  default:0
 },
   salePrice:{
     type:Number,
+    default:0
 },
   totalStock:{
     type:Number

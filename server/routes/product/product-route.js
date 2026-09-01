@@ -7,8 +7,8 @@ const authMiddleware = require("../../utils/authMiddleware");
 
 Routes.post("/upload-product-image",upload.single("my_filez"),handleImageUpload)
 Routes.post("/addproduct",authMiddleware,addProduct);
-Routes.put("/editproduct/:id",editProduct);
-Routes.delete("/deleteproduct/:id",deleteProduct);
+Routes.put("/editproduct/:id",authMiddleware,editProduct);
+Routes.delete("/deleteproduct/:id",authMiddleware,deleteProduct);
 Routes.get("/getallproduct",fetchAllProduct);
 
 
