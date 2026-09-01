@@ -35,29 +35,39 @@ async(formData)=>{
 
 
 )
-export const loginUser = createAsyncThunk("/auth/login",
-async(formData)=>{
-    try{
-        const response = await axios.post("http://localhost:5000/api/auth/login",formData,{
-            withCredentials:true
+export const loginUser = createAsyncThunk(
+    "/auth/login",
+    async (formData, { rejectWithValue }) => {
+        try {
+            const response = await axios.post("http://localhost:5000/api/auth/login", formData, {
+                withCredentials: true,
+            });
+            return response?.data;
+        } catch (error) {
+            const errorMessage = error.response?.data?.msg || "Invalid credentials";
+
+            console.log(error.response?.data?.msg || "good works");
+            return rejectWithValue(errorMessage);
         }
-     )
-     return response.data 
+    }
+);
+export const logoutUser = createAsyncThunk("/auth/logoutUser",
+async()=>{
+    try{
+        const response = await axios.post("http://localhost:5000/api/auth/logout", {}, {
+            withCredentials: true,
+        });
+        return response?.data;
 
     }catch(error){
-        const errorMessage =error.response?.data?.msg;
-    
-        
+        const errorMessage = error.response?.data?.msg;
+
         toast.add({
-        type: "error",
-       title: " Sorry an error occurred during login ",
-       description:errorMessage, 
-        
-      })
-    console.log(error.response?.data?.msg || "good works");
-    
-    
-        
+            type: "error",
+            title: " Sorry an error occurred during logout ",
+            description: errorMessage,
+        });
+        console.log(error.response?.data?.msg || "good works");
     }
 }
 
@@ -101,7 +111,7 @@ name:"auth",
 initialState,
 reducers:{
     setUser:(state,action)=>{
-
+      
     }
 },
 extraReducers: (builder)=>{
@@ -133,6 +143,10 @@ extraReducers: (builder)=>{
         state.user = action.payload !==undefined? action.payload.user:null;
         state.isAuthenticated = action.payload !==undefined ? true:false;;
     }).addCase(checkAuth.rejected,(state)=>{
+        state.isLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+    }).addCase(logoutUser.fulfilled,(state)=>{
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;

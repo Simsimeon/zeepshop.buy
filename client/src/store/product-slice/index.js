@@ -28,7 +28,7 @@ return result?.data
 )
 export const editProduct = createAsyncThunk("/product/editProduct",
    async ({id,formData}) =>{
-const result = await axios.put(`http://localhost:5000/api/admin/product/editproduct/${id}`,formData,{
+const result = await axios.put(`http://localhost:5000/api/admin/products/editproduct/${id}`,formData,{
     headers :{
         "Content-Type":"application/json",
     },
@@ -57,7 +57,7 @@ const AdminProductSlice= createSlice({
         state.isLoading = true;
     }).addCase(fetchAllProduct.fulfilled,(state,action)=>{
         state.isLoading = false,
-        state.products = action.payload
+        state.products = action.payload.data
         console.log(action.payload.data);
         
     }).addCase(fetchAllProduct.rejected,(state,action)=>{

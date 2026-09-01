@@ -36,7 +36,7 @@ export default function App() {
           <CheckAuth isAuthenticated={isAuthenticated} user={user}>
           <AuthLayout/>
         </CheckAuth> }>
-          <Route path="login"  element={<Login/>}/>
+          <Route path="login" element={<Login/>}/>
           <Route path="register" element={<Register/>}/>
         </Route>
         <Route path="/admin" element={
