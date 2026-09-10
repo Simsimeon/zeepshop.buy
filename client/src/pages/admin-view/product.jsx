@@ -15,11 +15,10 @@ import {
   addNewProduct,
   fetchAllProduct,
   deleteProduct,
-} from "@/store/product-slice";
+} from "@/store/admin/product-slice";
 import { toast } from "@/components/ui/toast";
 import AdminProductType from "@/components/admin-view/product-type";
 const initialFormData = {
-  image: "",
   title: "",
   description: "",
   category: "",
@@ -79,6 +78,8 @@ export default function AdminProduct() {
       .map((key) => formData[key] !== "")
       .every((item) => item);
   }
+  console.log(formData);
+  
  async function handleDeleteProduct(getCurrentProductId){
     console.log(getCurrentProductId);
    const response= await dispatch(deleteProduct({
