@@ -7,6 +7,9 @@ const app = express();
 const port = process.env.PORT || 5000;
 const authRouter = require("./routes/auth/auth-routes");
 const adminProductRouter = require("./routes/product/product-route")
+const shopProductRouter = require("./routes/shop/products-routes");
+const errorHandlerMiddleware = require("./middleware/error-handler");
+const notFoundRoute= require("./middleware/not-foundroute")
 app.use(
     cors({
         origin: "http://localhost:5173",
@@ -25,6 +28,9 @@ app.use(cookieParser(process.env.JWT_SECRET));
 app.use(express.json());
 app.use('/api/auth',authRouter);
 app.use('/api/admin/products',adminProductRouter);
+app.use('/api/shop/products',shopProductRouter);
+app.use(notFoundRoute)
+app.use(errorHandlerMiddleware)
 const startServer=async()=>{
     try{
         await connectDB(process.env.MONGOOSE_URI)

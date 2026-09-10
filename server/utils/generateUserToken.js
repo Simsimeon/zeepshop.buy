@@ -2,9 +2,10 @@ const jwt = require("jsonwebtoken");
 
 function createUserInfo (user){
  return{
-   userId:user._id,
+      userId:user._id,
        role:user.role ,
-     email:user.email
+      email:user.email,
+     username:user.username
  }
 
 
