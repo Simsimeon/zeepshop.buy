@@ -15,6 +15,9 @@ import {
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { logoutUser } from "@/store/authslice";
+import UserCartWrapper from "./cart-wrapper";
+import { useEffect, useState } from "react";
+import { fetchCartItem } from "@/store/shop/cart-slice";
 
 function MenuItems() {
   return (
@@ -34,6 +37,8 @@ function MenuItems() {
 
 function HeaderRightContent() {
   const { user } = useSelector((state) => state.auth);
+  const [openCartSheet,setOpenCartSheet]=useState(false)
+    const {cartItem}=useSelector(state=>state.shopCart);
   console.log(user);
   const firstInitial = user?.username.slice(0, 1).toUpperCase();
   const lastInitial = user?.username.slice(-1).toUpperCase();
@@ -43,12 +48,20 @@ function HeaderRightContent() {
  function handleLogout (){
      dispatch(logoutUser())
  }
+ useEffect(()=>{
+  dispatch(fetchCartItem(user?.userId))
+ },[dispatch,user?.userId])
+ console.log(cartItem.items,'jjjjj');
+ 
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
-      <Button variant="outline" size="icon">
+        <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
+        <Button onClick={()=>setOpenCartSheet(true)} variant="outline" size="icon">
         <ShoppingCart className="w-6 h-6" />
         <span className="sr-only">User Cart</span>
       </Button>
+      <UserCartWrapper cartItem={cartItem}/>
+      </Sheet>
       <DropdownMenu>
         <DropdownMenuTrigger className="rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
           <Avatar className="bg-black">

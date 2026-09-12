@@ -7,90 +7,120 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { sortOptions } from "@/config";
-import { fetchAllShoppingViewProduct, fetchProductDetails } from "@/store/shop/product-slice";
+import {
+  fetchAllShoppingViewProduct,
+  fetchProductDetails,
+} from "@/store/shop/product-slice";
 import { ArrowUpDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ShoppingProductType from "./product-type";
 import { useSearchParams } from "react-router-dom";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
+import { addToCart, fetchCartItem } from "@/store/shop/cart-slice";
+import { toast } from "@/components/ui/toast";
 
-function createSearchParamsHelpers(filterParams){
-  const queryParams =[]
-  
-  for(const[key,value]of Object.entries(filterParams)){
-    if(Array.isArray(value) && value.length > 0){
+function createSearchParamsHelpers(filterParams) {
+  const queryParams = [];
+
+  for (const [key, value] of Object.entries(filterParams)) {
+    if (Array.isArray(value) && value.length > 0) {
       const paramValue = value.join(",");
 
-      queryParams.push(`${key}=${encodeURIComponent(paramValue)}`)
+      queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
     }
   }
-  return queryParams.join("&")
+  return queryParams.join("&");
 }
-
-
-
 
 function ShoppingListing() {
-  const [filter, setFilter] = useState(()=>JSON.parse(sessionStorage.getItem('filter'))||{});
+  const [filter, setFilter] = useState(
+    () => JSON.parse(sessionStorage.getItem("filter")) || {},
+  );
   const [sort, setSort] = useState("price-lowtohigh");
   const dispatch = useDispatch();
-  const [searchParams,setSearchParams]=useSearchParams()
-  const { products, isLoading, productDetails } = useSelector((state) => state.shopProduct);
-   const [openProductDetailsDialog,setOpenProductDetailsDialog] = useState(false);
- 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { products, isLoading, productDetails } = useSelector(
+    (state) => state.shopProduct,
+  );
+  const {user}=useSelector(state =>state.auth);
+
+  const [openProductDetailsDialog, setOpenProductDetailsDialog] =
+    useState(false);
+
   function handleSort(value) {
-   setSort(value); 
+    setSort(value);
   }
-  function handleFilter(getSectionId,getCurrentOption){
-   console.log(getSectionId,"sectionId");
-   console.log(getCurrentOption,"getCurrentOption");
-   let copiedFilters = {...filter};
-   const indexOfCurrentSection= Object.keys(copiedFilters).indexOf(getSectionId);
-   if(indexOfCurrentSection === -1){
-      copiedFilters ={
+
+  function handleFilter(getSectionId, getCurrentOption) {
+    console.log(getSectionId, "sectionId");
+    console.log(getCurrentOption, "getCurrentOption");
+    let copiedFilters = { ...filter };
+    const indexOfCurrentSection =
+      Object.keys(copiedFilters).indexOf(getSectionId);
+    if (indexOfCurrentSection === -1) {
+      copiedFilters = {
         ...copiedFilters,
-        [getSectionId]:[getCurrentOption]
-      }  
-   }else{
-    const indexOfCurrentOption = copiedFilters[getSectionId].indexOf(getCurrentOption)
-  if(indexOfCurrentOption === -1){
-    copiedFilters[getSectionId].push(getCurrentOption)
-  }else{
-     copiedFilters[getSectionId].splice(indexOfCurrentOption,1)
-  }
-  
-  
-  }
-  setFilter(copiedFilters)
-   sessionStorage.setItem("filter",JSON.stringify(copiedFilters))
+        [getSectionId]: [getCurrentOption],
+      };
+    } else {
+      const indexOfCurrentOption =
+        copiedFilters[getSectionId].indexOf(getCurrentOption);
+      if (indexOfCurrentOption === -1) {
+        copiedFilters[getSectionId].push(getCurrentOption);
+      } else {
+        copiedFilters[getSectionId].splice(indexOfCurrentOption, 1);
+      }
+    }
+    setFilter(copiedFilters);
+    sessionStorage.setItem("filter", JSON.stringify(copiedFilters));
   }
   useEffect(() => {
-    if(filter !== null && sort !== null)
-    dispatch(fetchAllShoppingViewProduct(
-    {  filterParams:filter,
-     sortedParams:sort
+    if (filter !== null && sort !== null)
+      dispatch(
+        fetchAllShoppingViewProduct({
+          filterParams: filter,
+          sortedParams: sort,
+        }),
+      );
+  }, [dispatch, sort, filter]);
+  useEffect(() => {
+    if (filter && Object.keys(filter).length > 0) {
+      const createQueryString = createSearchParamsHelpers(filter);
+      setSearchParams(new URLSearchParams(createQueryString));
     }
-  ));
-  }, [dispatch,sort,filter]);
-  useEffect(()=>{
-    if(filter && Object.keys(filter).length > 0){
-      const createQueryString = createSearchParamsHelpers(filter)
-     setSearchParams(new URLSearchParams(createQueryString))
-   
-    } 
-  },[filter,setSearchParams])
+  }, [filter, setSearchParams]);
 
-  console.log(filter,"filter");
-  console.log(searchParams,"searchParams");
-  console.log(productDetails,"productDetails");
- async function handleProductDetails (getCurrentProductId){
- console.log(getCurrentProductId);
- const resultAction = await dispatch(fetchProductDetails(getCurrentProductId));
- if (fetchProductDetails.fulfilled.match(resultAction)) {
-   setOpenProductDetailsDialog(true);
- }
-}
+
+  async function handleProductDetails(getCurrentProductId) {
+    console.log(getCurrentProductId);
+    const resultAction = await dispatch(
+      fetchProductDetails(getCurrentProductId),
+    );
+    if (fetchProductDetails.fulfilled.match(resultAction)) {
+      setOpenProductDetailsDialog(true);
+    }
+  }
+ async function handleAddToCart (getCurrentProductId){
+    console.log(getCurrentProductId,"cart");
+    if (!user?.userId) {
+      toast.add({
+        type: "error",
+        title: "Please log in first",
+        duration: 4000,
+      });
+      return;
+    }
+
+    const response = await dispatch(addToCart({userId :user.userId,productId:getCurrentProductId,quantity:1}));
+   if (addToCart.fulfilled.match(response)) {
+       dispatch(fetchCartItem(user.userId));
+      toast.add({
+        title:"Product added to cart successfully",
+         duration: 4000,
+      })
+   }
+  }
   return (
     <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 md:p-6">
       <ProductFilter filter={filter} handFilter={handleFilter} />
@@ -123,13 +153,22 @@ function ShoppingListing() {
         </div>
         <div className="grid grid-cols-1 sm:grid-col-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
           {isLoading ? (
-            <p className="col-span-full text-muted-foreground">Loading products...</p>
+            <p className="col-span-full text-muted-foreground">
+              Loading products...
+            </p>
           ) : products.length > 0 ? (
             products.map((productItem) => (
-              <ShoppingProductType handleProductDetails={handleProductDetails} key={productItem._id} product={productItem} />
+              <ShoppingProductType
+                handleProductDetails={handleProductDetails}
+                key={productItem._id}
+                product={productItem}
+                handleAddToCart={handleAddToCart}
+              />
             ))
           ) : (
-            <p className="col-span-full text-muted-foreground">No products found.</p>
+            <p className="col-span-full text-muted-foreground">
+              No products found.
+            </p>
           )}
         </div>
       </div>
