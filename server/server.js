@@ -10,6 +10,8 @@ const adminProductRouter = require("./routes/product/product-route")
 const shopProductRouter = require("./routes/shop/products-routes");
 const errorHandlerMiddleware = require("./middleware/error-handler");
 const notFoundRoute= require("./middleware/not-foundroute")
+const shopCartRouter = require("./routes/shop/cart-routes")
+
 app.use(
     cors({
         origin: "http://localhost:5173",
@@ -29,6 +31,7 @@ app.use(express.json());
 app.use('/api/auth',authRouter);
 app.use('/api/admin/products',adminProductRouter);
 app.use('/api/shop/products',shopProductRouter);
+app.use('/api/shop/cart',shopCartRouter);
 app.use(notFoundRoute)
 app.use(errorHandlerMiddleware)
 const startServer=async()=>{

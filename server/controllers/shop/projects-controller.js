@@ -41,7 +41,6 @@ console.log(filters,"filters");
 console.log(sort,"sort");
       
         const products = await productModel.find(filters).sort(sort);
-        console.log(products,"product");
         
 res.status(StatusCodes.OK).json({  success:true,
     data:products
@@ -63,8 +62,9 @@ res.status(StatusCodes.OK).json({  success:true,
     const {id:productId}= req.params;
     const product= await productModel.findById(productId);
     if(!product){
-       throw new NotFoundError("Product not found") 
+       throw new NotFoundError("Product not found"); 
     }
+
    res.status(StatusCodes.OK).json({
     success:true,
     data:product
