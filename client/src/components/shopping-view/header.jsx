@@ -18,18 +18,32 @@ import { logoutUser } from "@/store/authslice";
 import UserCartWrapper from "./cart-wrapper";
 import { useEffect, useState } from "react";
 import { fetchCartItem } from "@/store/shop/cart-slice";
+import { Label } from "../ui/label";
 
 function MenuItems() {
+  const navigate = useNavigate()
+  function handleNavigate(getCurrentMenuItem){
+    if (getCurrentMenuItem.id === "home") {
+      sessionStorage.removeItem("filter");
+      navigate(getCurrentMenuItem.path);
+    } else {
+      const nextFilter = {
+        category: [getCurrentMenuItem.id],
+      };
+      sessionStorage.setItem("filter", JSON.stringify(nextFilter));
+      navigate(`${getCurrentMenuItem.path}?category=${getCurrentMenuItem.id}`);
+    }
+  }
   return (
     <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
       {shoppingViewHeaderMenuItems.map((menuItem) => (
-        <Link
-          className="text-sm font-medium"
-          to={menuItem.path}
-          key={menuItem.id}
+        <Label
+           onClick={()=>handleNavigate(menuItem)}
+          className="text-sm font-medium cursor-pointer"
+           key={menuItem.id}
         >
           {menuItem.label}
-        </Link>
+        </Label>
       ))}
     </nav>
   );
@@ -60,7 +74,9 @@ function HeaderRightContent() {
         <ShoppingCart className="w-6 h-6" />
         <span className="sr-only">User Cart</span>
       </Button>
-      <UserCartWrapper cartItem={cartItem}/>
+      <UserCartWrapper
+      setOpenCartSheet={setOpenCartSheet}
+       cartItem={cartItem}/>
       </Sheet>
       <DropdownMenu>
         <DropdownMenuTrigger className="rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">

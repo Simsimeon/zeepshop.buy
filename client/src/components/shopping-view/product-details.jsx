@@ -6,37 +6,21 @@ import { Separator } from "../ui/separator";
 import { Input } from "../ui/input";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCartItem } from "@/store/shop/cart-slice";
-import { useEffect, useState } from "react";
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
  const dispatch = useDispatch();
  const {user}=useSelector((state)=>state.auth);
- const [notification, setNotification] = useState(null);
- const { products } = useSelector(
-    (state) => state.shopProduct,
-  );console.log(productDetails,"fffffffffffffffff");
+ console.log(productDetails,"fffffffffffffffff");
 
- useEffect(() => {
-   if (!notification) return;
-
-   const timeoutId = setTimeout(() => setNotification(null), 4000);
-   return () => clearTimeout(timeoutId);
- }, [notification]);
-  
-  
  async function handleAddToCart (getCurrentProductId){
     console.log(getCurrentProductId,"cart");
     if (!user?.userId) {
-      setNotification({ type: "error", message: "Please log in first" });
       return;
     }
 
     const response = await dispatch(addToCart({userId :user.userId,productId:getCurrentProductId,quantity:1}));
    if (addToCart.fulfilled.match(response)) {
        dispatch(fetchCartItem(user.userId));
-      setNotification({ type: "success", message: "Product added to cart successfully" });
-   } else {
-      setNotification({ type: "error", message: "Unable to add product to cart" });
    }
   }
     return (
@@ -79,18 +63,6 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
             <span className="text-muted-foreground">(3.5)</span>
           </div>
           <div className="mt-5 mb-5">
-            {notification ? (
-              <div
-                className={`mb-3 rounded-md border px-3 py-2 text-sm ${
-                  notification.type === "error"
-                    ? "border-destructive/30 bg-destructive/10 text-destructive"
-                    : "border-green-200 bg-green-50 text-green-800"
-                }`}
-                role="status"
-              >
-                {notification.message}
-              </div>
-            ) : null}
             <Button className="w-full" onClick={()=>handleAddToCart(productDetails?._id)}>Add to Cart</Button>
           </div>
 

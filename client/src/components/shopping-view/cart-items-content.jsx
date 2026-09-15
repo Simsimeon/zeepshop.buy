@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteCartItem, updateCartQuantity } from "@/store/shop/cart-slice";
 
-export default function UserCartItemsContent({ cartItem, onNotify }) {
+export default function UserCartItemsContent({ cartItem }) {
   console.log(cartItem, "iiii");
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
@@ -20,16 +20,13 @@ export default function UserCartItemsContent({ cartItem, onNotify }) {
    const nextQuantity = typeOfAction === "add"
      ? getCartItem.quantity + 1
      : Math.max(1, getCartItem.quantity - 1);
-   const response = await dispatch(
+  await dispatch(
       updateCartQuantity({
         userId: user?.userId,
         productId: getCartItem?.productId,
         quantity: nextQuantity,
       }),
     );
-   if (updateCartQuantity.fulfilled.match(response)) {
-      onNotify?.("Cart item updated successfully");
-   }
   }
   return (
     <div className="flex items-center space-x-4">

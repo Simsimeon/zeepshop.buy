@@ -12,7 +12,7 @@ import {
   fetchProductDetails,
 } from "@/store/shop/product-slice";
 import { ArrowUpDownIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ShoppingProductType from "./product-type";
 import { useSearchParams } from "react-router-dom";
@@ -34,12 +34,19 @@ function createSearchParamsHelpers(filterParams) {
 }
 
 function ShoppingListing() {
-  const [filter, setFilter] = useState(
-    () => JSON.parse(sessionStorage.getItem("filter")) || {},
-  );
   const [sort, setSort] = useState("price-lowtohigh");
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
+  const filter = useMemo(() => {
+    const nextFilter = {};
+    const category = searchParams.get("category");
+    const brand = searchParams.get("brand");
+
+    if (category) nextFilter.category = category.split(",");
+    if (brand) nextFilter.brand = brand.split(",");
+
+    return nextFilter;
+  }, [searchParams]);
   const { products, isLoading, productDetails } = useSelector(
     (state) => state.shopProduct,
   );
@@ -55,7 +62,10 @@ function ShoppingListing() {
   function handleFilter(getSectionId, getCurrentOption) {
     console.log(getSectionId, "sectionId");
     console.log(getCurrentOption, "getCurrentOption");
-    let copiedFilters = { ...filter };
+    let copiedFilters = {
+      ...filter,
+      [getSectionId]: [...(filter[getSectionId] || [])],
+    };
     const indexOfCurrentSection =
       Object.keys(copiedFilters).indexOf(getSectionId);
     if (indexOfCurrentSection === -1) {
@@ -72,7 +82,8 @@ function ShoppingListing() {
         copiedFilters[getSectionId].splice(indexOfCurrentOption, 1);
       }
     }
-    setFilter(copiedFilters);
+    const queryString = createSearchParamsHelpers(copiedFilters);
+    setSearchParams(new URLSearchParams(queryString));
     sessionStorage.setItem("filter", JSON.stringify(copiedFilters));
   }
   useEffect(() => {
@@ -84,12 +95,6 @@ function ShoppingListing() {
         }),
       );
   }, [dispatch, sort, filter]);
-  useEffect(() => {
-    if (filter && Object.keys(filter).length > 0) {
-      const createQueryString = createSearchParamsHelpers(filter);
-      setSearchParams(new URLSearchParams(createQueryString));
-    }
-  }, [filter, setSearchParams]);
 
 
   async function handleProductDetails(getCurrentProductId) {
@@ -104,22 +109,19 @@ function ShoppingListing() {
  async function handleAddToCart (getCurrentProductId){
     console.log(getCurrentProductId,"cart");
     if (!user?.userId) {
-      toast.add({
-        type: "error",
-        title: "Please log in first",
-        duration: 4000,
-      });
       return;
     }
 
     const response = await dispatch(addToCart({userId :user.userId,productId:getCurrentProductId,quantity:1}));
-   if (addToCart.fulfilled.match(response)) {
-       dispatch(fetchCartItem(user.userId));
       toast.add({
-        title:"Product added to cart successfully",
-         duration: 4000,
+        title:"Product is added to cart",
+        duration:2000
       })
+    if (addToCart.fulfilled.match(response)) {
+       dispatch(fetchCartItem(user.userId));
+      
    }
+
   }
   return (
     <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 md:p-6">
