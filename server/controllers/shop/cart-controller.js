@@ -84,7 +84,6 @@ async function updateCartItemQuantity(req, res) {
     (item) => item.productId.toString() === productId
   );
   if (currentProductIndex === -1) throw new NotFoundError("Cart item not found");
-
   cart.items[currentProductIndex].quantity = Number(quantity);
   await cart.save();
   await cart.populate({
