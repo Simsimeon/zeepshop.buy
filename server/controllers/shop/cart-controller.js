@@ -16,6 +16,7 @@ function formatCartItems(items) {
       title: product?.title || "Product not found",
       price: product?.price ?? null,
       salePrice: product?.salePrice ?? null,
+      totalStock: product?.totalStock ?? 0,
       quantity: item.quantity,
     };
   });
@@ -45,7 +46,15 @@ async function addToCart(req, res) {
   }
 
   await cart.save();
-  return res.status(StatusCodes.OK).json({ success: true, data: cart });
+  await cart.populate({
+    path: "items.productId",
+    select: "image title price salePrice totalStock",
+  });
+
+  return res.status(StatusCodes.OK).json({
+    success: true,
+    data: { ...cart.toObject(), items: formatCartItems(cart.items) },
+  });
 }
 
 async function fetchCartItem(req, res) {
@@ -54,7 +63,7 @@ async function fetchCartItem(req, res) {
 
   const cart = await Cart.findOne({ userId }).populate({
     path: "items.productId",
-    select: "image title price salePrice",
+    select: "image title price salePrice totalStock",
   });
   if (!cart) throw new NotFoundError("Cart not found");
 
@@ -88,7 +97,7 @@ async function updateCartItemQuantity(req, res) {
   await cart.save();
   await cart.populate({
     path: "items.productId",
-    select: "image title price salePrice",
+    select: "image title price salePrice totalStock",
   });
 
   return res.status(StatusCodes.OK).json({
@@ -112,7 +121,7 @@ async function deleteCartItem(req, res) {
   await cart.save();
   await cart.populate({
     path: "items.productId",
-    select: "image title price salePrice",
+    select: "image title price salePrice totalStock",
   });
 
   return res.status(StatusCodes.OK).json({

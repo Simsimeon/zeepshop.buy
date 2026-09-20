@@ -19,6 +19,16 @@ const ProductSchema= new mongoose.Schema({
   category:{
     type:String
 },
+numOfReviews:{
+        type:Number,
+        required:true,
+        default:0
+    },
+    averageRating:{
+        type:Number,
+        required:true,
+        default:0
+    },
   Brand:{type:String},
   price:{
   type:Number,
@@ -40,7 +50,16 @@ const ProductSchema= new mongoose.Schema({
   type:String,
   required:true
  }   
-},{timestamps:true});
+},{timestamps:true, toJSON:{virtuals:true},toObject:{virtuals:true}});
+ProductSchema.pre('remove',async function(next){
+    await this.model("Review").deleteMany({product: this._id})
+})
+ProductSchema.virtual("reviews",{
+    ref:"Review",
+    localField:"_id",
+    foreignField:'product',
+    justOne:false,
+})
 
 
 

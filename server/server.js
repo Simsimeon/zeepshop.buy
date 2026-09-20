@@ -12,7 +12,9 @@ const errorHandlerMiddleware = require("./middleware/error-handler");
 const notFoundRoute= require("./middleware/not-foundroute");
 const shopCartRouter = require("./routes/shop/cart-routes");
 const shopAddressRouter = require("./routes/shop/address-routes");
-
+const shopOrderRouter = require("./routes/shop/order-routes");
+const searchProductRouter=require("./routes/shop/search-routes");
+const reviewRouter = require("./routes/review/review-routes");
 app.use(
     cors({
         origin: "http://localhost:5173",
@@ -34,6 +36,9 @@ app.use('/api/admin/products',adminProductRouter);
 app.use('/api/shop/products',shopProductRouter);
 app.use('/api/shop/cart',shopCartRouter);
 app.use('/api/shop/address',shopAddressRouter);
+app.use('/api/shop/order',shopOrderRouter);
+app.use('/api/shop/search',searchProductRouter);
+app.use('/api/reviews', reviewRouter);
 app.use(notFoundRoute)
 app.use(errorHandlerMiddleware)
 const startServer=async()=>{
