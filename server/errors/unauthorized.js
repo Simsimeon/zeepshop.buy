@@ -4,6 +4,7 @@ class UnauthorizedError extends  CustomApiError{
     constructor(message){
         super(message);
         this.status = StatusCodes.FORBIDDEN
+        this.statusCode = StatusCodes.FORBIDDEN
     }
 }
 

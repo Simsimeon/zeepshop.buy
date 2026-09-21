@@ -15,6 +15,7 @@ const shopAddressRouter = require("./routes/shop/address-routes");
 const shopOrderRouter = require("./routes/shop/order-routes");
 const searchProductRouter=require("./routes/shop/search-routes");
 const reviewRouter = require("./routes/review/review-routes");
+const heroImageRouter = require("./routes/common/heroimage");
 app.use(
     cors({
         origin: "http://localhost:5173",
@@ -39,6 +40,7 @@ app.use('/api/shop/address',shopAddressRouter);
 app.use('/api/shop/order',shopOrderRouter);
 app.use('/api/shop/search',searchProductRouter);
 app.use('/api/reviews', reviewRouter);
+app.use('/api/heroimage', heroImageRouter);
 app.use(notFoundRoute)
 app.use(errorHandlerMiddleware)
 const startServer=async()=>{

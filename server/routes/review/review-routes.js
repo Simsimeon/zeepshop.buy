@@ -8,9 +8,9 @@ const {
 const authMiddleware = require("../../utils/authMiddleware");
 
 const Routes = express.Router();
-Routes.get("/",getAllReviews)
-Routes.post("/product/:productId", authMiddleware, createReview);
-Routes.put("/:reviewId", authMiddleware, updateReview);
-Routes.delete("/:reviewId", authMiddleware, deleteReview);
+Routes.get("/",authMiddleware,authMiddleware.authorizePermissions("admin"), getAllReviews)
+Routes.post("/product/:productId", authMiddleware,authMiddleware.authorizePermissions("user"), createReview);
+Routes.put("/:reviewId", authMiddleware,authMiddleware.authorizePermissions("user") ,updateReview);
+Routes.delete("/:reviewId", authMiddleware,authMiddleware.authorizePermissions("user") ,deleteReview);
 
 module.exports = Routes;

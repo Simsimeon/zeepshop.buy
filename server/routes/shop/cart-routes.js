@@ -5,10 +5,10 @@ const authMiddleware = require("../../utils/authMiddleware");
 const Routes = express.Router();
 
 
-Routes.post("/add", authMiddleware, addToCart)
-Routes.get("/get/:userId", authMiddleware, fetchCartItem)
-Routes.put("/update-cart", authMiddleware, updateCartItemQuantity)
-Routes.delete("/:userId/:productId", authMiddleware, deleteCartItem)
+Routes.post("/add", authMiddleware,authMiddleware.authorizePermissions("user"), addToCart)
+Routes.get("/get/:userId", authMiddleware,authMiddleware.authorizePermissions("user"), fetchCartItem)
+Routes.put("/update-cart", authMiddleware,authMiddleware.authorizePermissions("user"), updateCartItemQuantity)
+Routes.delete("/:userId/:productId", authMiddleware,authMiddleware.authorizePermissions("user"), deleteCartItem)
 
 
 

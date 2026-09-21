@@ -1,4 +1,5 @@
 ﻿const jwt = require("jsonwebtoken");
+const { UnauthorizedError } = require("../errors");
 
 const authMiddleware = async (req, res, next) => {
   const signedCookieToken = req.signedCookies?.token;
@@ -22,5 +23,22 @@ const authMiddleware = async (req, res, next) => {
     return res.status(401).json({ msg: "Unauthorized user" });
   }
 };
+const authorizePermissions = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ success: false, msg: "Unauthorized user" });
+    }
+
+    const userRole = req.user?.userInfo?.role || req.user?.role;
+
+    if (!roles.includes(userRole)) {
+      throw new UnauthorizedError("Unauthorized to access this route");
+    }
+
+    return next();
+  };
+};
 
 module.exports = authMiddleware;
+module.exports.authMiddleware = authMiddleware;
+module.exports.authorizePermissions = authorizePermissions;

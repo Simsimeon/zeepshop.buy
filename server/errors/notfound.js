@@ -6,6 +6,7 @@ class NotFoundError extends CustomApiError{
     constructor(message){
         super(message)
         this.status = StatusCodes.NOT_FOUND
+        this.statusCode = StatusCodes.NOT_FOUND
     }
 };
 
