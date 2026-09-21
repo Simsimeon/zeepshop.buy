@@ -49,9 +49,11 @@ const initialState = {
  const shoppingCartSlice = createSlice({
     name:"shoppingCart",
     initialState,
-    reducers(){
-
-    },
+        reducers:{
+            clearCart: (state) => {
+                state.cartItem = { items: [] };
+            },
+        },
     extraReducers(builder){
     builder.addCase(addToCart.pending,(state)=>{
         state.isLoading = true
@@ -91,4 +93,5 @@ const initialState = {
 
 
 
+ export const { clearCart } = shoppingCartSlice.actions;
  export default shoppingCartSlice.reducer

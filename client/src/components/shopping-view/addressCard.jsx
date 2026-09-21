@@ -14,11 +14,20 @@ import {
 } from "../ui/dialog";
 import { Label } from "../ui/label";
 
-export default function AddressCard({ handleEditAddress,addressInfo,handleDeleteAddress}) {
+export default function AddressCard({
+  handleEditAddress,
+  addressInfo,
+  handleDeleteAddress,
+  isSelected,
+  onSelect,
+}) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
    
   return (
-    <Card>
+    <Card
+      className={isSelected ? "border-primary ring-2 ring-primary/20" : ""}
+      onClick={onSelect}
+    >
       <CardContent className="grid min-w-0 gap-4 p-2">
         <Label className="wrap-break-word">{addressInfo?.address}</Label>
         <Label className="wrap-break-word">{addressInfo?.city}</Label>
@@ -27,7 +36,10 @@ export default function AddressCard({ handleEditAddress,addressInfo,handleDelete
         <Label className="wrap-break-word">{addressInfo?.note}</Label>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button onClick={()=>handleEditAddress(addressInfo)}>
+        <Button onClick={(event) => {
+          event.stopPropagation();
+          handleEditAddress(addressInfo);
+        }}>
           <span className="hidden sm:inline-block">edit</span>
           <SquarePen />
         </Button>
@@ -51,7 +63,8 @@ export default function AddressCard({ handleEditAddress,addressInfo,handleDelete
               <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
               <Button
                 variant="destructive"
-                onClick={() => {
+                onClick={(event) => {
+                  event.stopPropagation();
                   handleDeleteAddress(addressInfo);
                   setIsDeleteDialogOpen(false);
                 }}

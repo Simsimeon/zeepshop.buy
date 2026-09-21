@@ -19,13 +19,13 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllProduct } from "@/store/admin/product-slice";
 import { fetchAllShoppingViewProduct, fetchProductDetails } from "@/store/shop/product-slice";
 import ShoppingProductType from "./product-type";
 import { useNavigate } from "react-router-dom";
 import { addToCart, fetchCartItem } from "@/store/shop/cart-slice";
 import { toast } from "@/components/ui/toast";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
+import { useRequireAuth } from "@/components/common/use-require-auth";
 const slides = [bannerOne, bannerTwo, bannerThree];
 const categoriesWithIcons = [
   { id: "men", label: "Men", icon: ShirtIcon },
@@ -47,6 +47,7 @@ function ShoppingHome() {
   const { products,productDetails } = useSelector((state) => state.shopProduct);
   const [openProductDetailsDialog,setOpenProductDetailsDialog]=useState(false)
   const { user } = useSelector((state) => state.auth);
+  const promptSignIn = useRequireAuth();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   useEffect(() => {
@@ -78,18 +79,20 @@ function handleGetProductDetails (getCurrentProductId){
   dispatch(fetchProductDetails(getCurrentProductId))
 }
 async function handleAddToCart (getCurrentProductId){
-    console.log(getCurrentProductId,"cart");
     if (!user?.userId) {
+      promptSignIn({
+        description: "Sign in to add items to your cart.",
+      });
       return;
     }
 
     const response = await dispatch(addToCart({userId :user.userId,productId:getCurrentProductId,quantity:1}));
-    toast.add({
-        title:"Product is added to cart",
-        duration:2000
-    })
    if (addToCart.fulfilled.match(response)) {
        dispatch(fetchCartItem(user.userId));
+       toast.add({
+         title:"Product is added to cart",
+         duration:2000
+       })
    }
   }
   return (

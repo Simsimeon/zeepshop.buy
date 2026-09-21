@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import AuthLayout from "./components/auth/layout";
 import { Login } from "./pages/auth/login";
 import Register from "./pages/auth/register";
+import ForgotPassword from "./pages/auth/forgot-password";
 import AdminLayout from "./components/admin-view/layout";
 import AdminDashBoard from "./pages/admin-view/dashoard";
 import AdminProduct from "./pages/admin-view/product";
@@ -32,12 +33,14 @@ export default function App() {
     <div className="flex flex-col overflow-hidden bg-white">
       {/* <h1>Header component</h1> */}
       <Routes>
+        <Route path="/" element={<ShoppingListing/>}/>
         <Route path="/auth" element={
           <CheckAuth isAuthenticated={isAuthenticated} user={user}>
           <AuthLayout/>
         </CheckAuth> }>
           <Route path="login" element={<Login/>}/>
           <Route path="register" element={<Register/>}/>
+          <Route path="forgot-password" element={<ForgotPassword/>}/>
         </Route>
         <Route path="/admin" element={
           <CheckAuth isAuthenticated={isAuthenticated} user={user}>
@@ -53,6 +56,7 @@ export default function App() {
             <Route path="checkout" element={<SHoppingCheckout/>}/>
             <Route path="listing" element={<ShoppingListing/>}/>
             <Route path="account" element={<ShoppingAccount/>}/>
+    
         </Route>
          <Route path="unauth-page" element={<Unauthpage/>}/>
         <Route path="*" element={<NotFound/>}/>

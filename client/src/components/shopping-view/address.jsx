@@ -20,7 +20,7 @@ const initialAddressFormData = {
   note: "",
 };
 
-function Address() {
+function Address({ selectedAddressId, onSelectAddress }) {
   const [formData, setFormData] = useState(initialAddressFormData);
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const { user } = useSelector((state) => state.auth);
@@ -114,6 +114,8 @@ function Address() {
               <AddressCard
                 key={index}
                 addressInfo={singleAddressItem}
+                isSelected={selectedAddressId === singleAddressItem._id}
+                onSelect={() => onSelectAddress?.(singleAddressItem._id)}
                 handleDeleteAddress={handleDeleteAddress}
                 handleEditAddress={handleEditAddress}
               />

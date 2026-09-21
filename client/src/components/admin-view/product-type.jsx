@@ -1,3 +1,5 @@
+import { Pencil, Trash2 } from "lucide-react";
+import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter } from "../ui/card";
 
@@ -6,43 +8,83 @@ export default function AdminProductType({
   setOpenCreateProductsDialog,
   setCurrentEditedId,
   product,
-  handleDeleteProduct
+  handleDeleteProduct,
 }) {
+  const isOnSale = Number(product?.salePrice) > 0;
+  const isOutOfStock = Number(product?.totalStock) <= 0;
+
   return (
-    <Card className="w-full max-w-sm mx-auto">
-      <div className="">
-        <div className="relative ">
+    <Card className="group mx-auto flex h-full w-full max-w-sm flex-col overflow-hidden border-border/80 bg-card shadow-sm transition-shadow hover:shadow-md">
+        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           <img
             src={product?.image}
-            alt={product?.title}
-            className="w-full h-75 object-cover rounded-t-lg"
+            alt={`${product?.title || "Product"} product image`}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           />
+          <div className="absolute left-3 top-3 flex gap-2">
+            <Badge variant={isOutOfStock ? "destructive" : "secondary"}>
+              {isOutOfStock ? "Out of stock" : `${product?.totalStock} in stock`}
+            </Badge>
+            {isOnSale && <Badge>Sale</Badge>}
+          </div>
         </div>
-        <CardContent>
-          <h2 className="text-xl font-bold mb-2">{product?.title}</h2>
-          <div className="flex justify-between items-center mb-2 mt-2">
-            <span
-              className={`${product?.salePrice > 0 ? "line-through" : ""} text-lg font-semibold text-primary`}
-            >
-              ${product?.price}
+        <CardContent className="flex flex-1 flex-col gap-4 p-4">
+          <div className="min-w-0">
+            <h2 className="truncate text-base font-semibold tracking-tight">
+              {product?.title.toUpperCase()}
+            </h2>
+           
+          </div>
+          <div className="flex items-end justify-between gap-3">
+            <div className="flex items-baseline gap-2">
+              <span className="text-lg font-semibold text-primary">
+                ${isOnSale ? product?.salePrice : product?.price}
+              </span>
+              {isOnSale && (
+                <span className="text-sm text-muted-foreground line-through">
+                  ${product?.price}
+                </span>
+              )}
+            </div>
+            <span className="text-right text-xs text-muted-foreground">
+              {product?.category || "Product"}
             </span>
-            {product?.salePrice && (
-              <span className="text-lg font-bold">${product?.salePrice}</span>
-            )}
+          </div>
+          <div className="grid grid-cols-2 gap-3 border-t border-border/70 pt-3 text-sm">
+            <div>
+              <p className="text-xs text-muted-foreground">Stock</p>
+              <p className="mt-1 font-medium">{product?.totalStock ?? 0}</p>
+            </div>
+            <div className="min-w-0 text-right">
+              <p className="text-xs text-muted-foreground">Seller</p>
+              <p className="mt-1 truncate font-medium">
+                {product?.productCreator || "No name"}
+              </p>
+              </div>
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col">
-          <div className="">{product?.productCreator || "no name"}</div>
-          <div className=" w-full flex justify-between items-center">
-            <Button onClick={()=>{
+        <CardFooter className="grid grid-cols-2 gap-2 border-t border-border/70 p-4 pt-3">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
                 setOpenCreateProductsDialog(true);
                 setCurrentEditedId(product._id);
                 setFormData(product);
-            }}>Edit</Button>
-            <Button onClick={()=>handleDeleteProduct(product._id)}>Delete</Button>
-          </div>
+              }}
+            >
+              <Pencil />
+              Edit
+            </Button>
+            <Button
+              variant="destructive"
+              className="w-full"
+              onClick={() => handleDeleteProduct(product._id)}
+            >
+              <Trash2 />
+              Delete
+            </Button>
         </CardFooter>
-      </div>
     </Card>
   );
 }
