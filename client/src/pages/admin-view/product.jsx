@@ -18,6 +18,8 @@ import {
 } from "@/store/admin/product-slice";
 import { toast } from "@/components/ui/toast";
 import AdminProductType from "@/components/admin-view/product-type";
+import { ProductGridSkeleton } from "@/components/common/skeletons";
+import { invalidateProductCache } from "@/store/shop/product-slice";
 const initialFormData = {
   title: "",
   description: "",
@@ -35,7 +37,9 @@ export default function AdminProduct() {
   const [uploadedImageUrl, setUploadImageUrl] = useState("");
   const [imageLoading, setImageLoading] = useState(false);
   const dispatch = useDispatch();
-  const { products } = useSelector((state) => state.adminProducts);
+  const { products, isLoading: isProductsLoading } = useSelector(
+    (state) => state.adminProducts,
+  );
   const [currentEditedId, setCurrentEditedId] = useState(null);
   async function onSubmit(e) {
     e.preventDefault();
@@ -49,6 +53,7 @@ export default function AdminProduct() {
       console.log(editedResponse, "edit");
       if (editedResponse?.payload?.success) {
         dispatch(fetchAllProduct());
+        dispatch(invalidateProductCache());
         setFormData(initialFormData);
         setOpenCreateProductsDialog(false);
         setCurrentEditedId(null);
@@ -65,6 +70,7 @@ export default function AdminProduct() {
       setImageFile(null);
       setFormData(initialFormData);
       dispatch(fetchAllProduct());
+      dispatch(invalidateProductCache());
       setOpenCreateProductsDialog(false);
       toast.add({
         title: "Product add successfully",
@@ -85,6 +91,7 @@ export default function AdminProduct() {
    const response= await dispatch(deleteProduct({
     id:getCurrentProductId}))
     if (response?.payload?.success) {
+        dispatch(invalidateProductCache());
         dispatch(fetchAllProduct());
     }
   }
@@ -104,18 +111,20 @@ export default function AdminProduct() {
         </Button>
       </div>
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {products && products.length > 0
-          ? products.map((productItem, i) => (
-              <AdminProductType
-                setFormData={setFormData}
-                setOpenCreateProductsDialog={setOpenCreateProductsDialog}
-                setCurrentEditedId={setCurrentEditedId}
-                product={productItem}
-                key={i}
-                handleDeleteProduct={handleDeleteProduct}
-              />
-            ))
-          : null}
+        {isProductsLoading ? (
+          <ProductGridSkeleton count={8} columns={3} />
+        ) : products && products.length > 0 ? (
+          products.map((productItem, i) => (
+            <AdminProductType
+              setFormData={setFormData}
+              setOpenCreateProductsDialog={setOpenCreateProductsDialog}
+              setCurrentEditedId={setCurrentEditedId}
+              product={productItem}
+              key={i}
+              handleDeleteProduct={handleDeleteProduct}
+            />
+          ))
+        ) : null}
       </div>
       <Sheet
         className=""

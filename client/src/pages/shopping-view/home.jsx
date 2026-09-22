@@ -26,6 +26,9 @@ import { addToCart, fetchCartItem } from "@/store/shop/cart-slice";
 import { toast } from "@/components/ui/toast";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import { useRequireAuth } from "@/components/common/use-require-auth";
+import { ProductGridSkeleton } from "@/components/common/skeletons";
+import { LazyImage } from "@/components/common/lazy-image";
+import { getHeroImages } from "@/store/shop/common-slice";
 const slides = [bannerOne, bannerTwo, bannerThree];
 const categoriesWithIcons = [
   { id: "men", label: "Men", icon: ShirtIcon },
@@ -44,19 +47,32 @@ const brandWithIcon = [
 ];
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { products,productDetails } = useSelector((state) => state.shopProduct);
+  const { products, productDetails, isLoading } = useSelector(
+    (state) => state.shopProduct,
+  );
+     const {heroImages}=useSelector(state=>state.heroImage)
+
+     // Fall back to the bundled banners until an admin uploads hero images,
+     // so the home page never renders an empty hero.
+     const heroSlides =
+       heroImages.length > 0 ? heroImages.map((hero) => hero.image) : slides;
+     const heroCount = heroSlides.length;
   const [openProductDetailsDialog,setOpenProductDetailsDialog]=useState(false)
   const { user } = useSelector((state) => state.auth);
   const promptSignIn = useRequireAuth();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   useEffect(() => {
+    // Nothing to cycle through (and `% 0` would produce NaN).
+    if (heroCount < 2) return;
+
     const timer = setInterval(
-      () => setCurrentSlide((pervSlice) => (pervSlice + 1) % slides.length),
+      () => setCurrentSlide((prevSlide) => (prevSlide + 1) % heroCount),
       5000,
     );
+
     return () => clearInterval(timer);
-  }, []);
+  }, [heroCount]);
 
   useEffect(() => {
     dispatch(
@@ -66,6 +82,11 @@ function ShoppingHome() {
       }),
     );
   }, [dispatch]);
+  useEffect(()=>{
+    dispatch(getHeroImages())
+  
+    
+  },[dispatch])
   function handleNavigateToListPage(getCurrentItem, section) {
     sessionStorage.removeItem("filter");
     const currentFilter = {
@@ -98,35 +119,41 @@ async function handleAddToCart (getCurrentProductId){
   return (
     <div className="flex flex-col min-h-screen">
       <div className="relative w-full h-150 overflow-hidden">
-        {slides.map((slide, index) => (
-          <img
+        {heroSlides.map((slide, index) => (
+          <LazyImage
             src={slide}
             key={index}
+            eager={index === 0}
+            alt=""
             className={`${index === currentSlide ? "opacity-100" : "opacity-0"} absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-2000`}
           />
         ))}
-        <Button
-          variant="outline"
-          onClick={() =>
-            setCurrentSlide(
-              (prevSlide) => (prevSlide - 1 + slides.length) % slides.length,
-            )
-          }
-          size="icon"
-          className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white/80"
-        >
-          <ChevronLeftIcon className="w-4 h-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() =>
-            setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length)
-          }
-          className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white/80"
-        >
-          <ChevronRightIcon className="w-4 h-4" />
-        </Button>
+        {heroCount > 1 && (
+          <>
+            <Button
+              variant="outline"
+              onClick={() =>
+                setCurrentSlide(
+                  (prevSlide) => (prevSlide - 1 + heroCount) % heroCount,
+                )
+              }
+              size="icon"
+              className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white/80"
+            >
+              <ChevronLeftIcon className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() =>
+                setCurrentSlide((prevSlide) => (prevSlide + 1) % heroCount)
+              }
+              className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white/80"
+            >
+              <ChevronRightIcon className="w-4 h-4" />
+            </Button>
+          </>
+        )}
       </div>
       <section className="py-12 bg-gray-50 ">
         <div className="container mx-auto px-4">
@@ -178,16 +205,20 @@ async function handleAddToCart (getCurrentProductId){
             Featured Products
           </h2>
           <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {products && products.length > 0
-              ? products
-                  .slice(0, 4)
-                  .map((productItem, i) => (
-                    <ShoppingProductType
+            {isLoading ? (
+              <ProductGridSkeleton count={4} />
+            ) : products && products.length > 0 ? (
+              products
+                .slice(0, 4)
+                .map((productItem, i) => (
+                  <ShoppingProductType
                     handleAddToCart={handleAddToCart}
                     handleProductDetails={handleGetProductDetails}
-                    key={i} product={productItem} />
-                  ))
-              : null}
+                    key={i}
+                    product={productItem}
+                  />
+                ))
+            ) : null}
           </div>
         </div>
       </section>

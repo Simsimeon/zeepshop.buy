@@ -2,6 +2,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter } from "../ui/card";
+import { LazyImage } from "../common/lazy-image";
 
 export default function AdminProductType({
   setFormData,
@@ -16,7 +17,7 @@ export default function AdminProductType({
   return (
     <Card className="group mx-auto flex h-full w-full max-w-sm flex-col overflow-hidden border-border/80 bg-card shadow-sm transition-shadow hover:shadow-md">
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-          <img
+          <LazyImage
             src={product?.image}
             alt={`${product?.title || "Product"} product image`}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"

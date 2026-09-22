@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { fetchUserOrders } from "@/store/shop/order-slice";
 import ShoppingOrderDetailsViews from "./order-details";
 import { Badge } from "../ui/badge";
+import { TableRowsSkeleton } from "@/components/common/skeletons";
 
 function ShoppingOrders() {
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -28,7 +29,6 @@ function ShoppingOrders() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {isLoading && <p className="py-6 text-center">Loading orders...</p>}
         {!isLoading && error && <p className="py-6 text-center text-destructive">{error}</p>}
         {!isLoading && !error && orders.length === 0 && (
           <p className="py-6 text-center text-muted-foreground">No orders yet.</p>
@@ -46,7 +46,10 @@ function ShoppingOrders() {
               </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order) => (
+            {isLoading ? (
+              <TableRowsSkeleton rows={4} columns={5} label="Loading orders" />
+            ) : null}
+            {!isLoading && orders.map((order) => (
               <TableRow key={order._id}>
                 <TableCell>{order._id}</TableCell>
                 <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>

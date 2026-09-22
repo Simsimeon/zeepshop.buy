@@ -6,6 +6,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { fetchAllOrders } from "@/store/shop/order-slice";
 import AdminOrderDetailsView from "./orderdetails";
+import { TableRowsSkeleton } from "@/components/common/skeletons";
 
 
 function AdminOrdersView() {
@@ -26,7 +27,6 @@ function AdminOrdersView() {
         </CardTitle>
       </CardHeader>
         <CardContent>
-        {isLoading && <p className="py-6 text-center">Loading orders...</p>}
         {!isLoading && error && <p className="py-6 text-center text-destructive">{error}</p>}
         {!isLoading && !error && orders.length === 0 && (
           <p className="py-6 text-center text-muted-foreground">No orders found.</p>
@@ -44,7 +44,10 @@ function AdminOrdersView() {
               </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order) => (
+            {isLoading ? (
+              <TableRowsSkeleton rows={4} columns={5} label="Loading orders" />
+            ) : null}
+            {!isLoading && orders.map((order) => (
               <TableRow key={order._id}>
                 <TableCell>{order._id}</TableCell>
                 <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>

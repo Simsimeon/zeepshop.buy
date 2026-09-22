@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { brandsOptionsMap, categoryOptionsMap } from "@/config";
+import { LazyImage } from "@/components/common/lazy-image";
 
 function ShoppingProductType({ product, handleProductDetails, handleAddToCart }) {
     const isOnSale = Number(product?.salePrice) > 0;
@@ -21,7 +22,7 @@ function ShoppingProductType({ product, handleProductDetails, handleAddToCart })
                 onClick={() => handleProductDetails(product?._id)}
                 aria-label={isOutOfStock ? `${product?.title} is out of stock` : `View details for ${product?.title}`}
             >
-                <img
+                <LazyImage
                     src={product?.image}
                     alt={`${product?.title || "Product"} product image`}
                     className={`h-full w-full object-cover transition duration-300 group-hover:scale-[1.03] ${

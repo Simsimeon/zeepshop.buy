@@ -16,6 +16,8 @@ import ProductRating from "./rating";
 import { Textarea } from "../ui/textarea";
 import { toast } from "../ui/toast";
 import { useRequireAuth } from "../common/use-require-auth";
+import { ReviewListSkeleton } from "../common/skeletons";
+import { LazyImage } from "../common/lazy-image";
 import { useEffect, useState } from "react";
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
@@ -135,7 +137,8 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className=" grid grid-cols-2 gap-8 sm:p-12 max-w-[90vw] sm:max-w-[80vw] lg:max-w-[70vw]">
         <div className="relative overflow-hidden rounded-lg">
-          <img
+          <LazyImage
+            eager
             src={productDetails?.image}
             alt={productDetails?.title}
             width={600}
@@ -209,7 +212,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
               </Button>
             </form>
             {isReviewsLoading ? (
-              <p className="py-6 text-center text-muted-foreground">Loading reviews...</p>
+              <ReviewListSkeleton count={3} />
             ) : reviewsError ? (
               <p className="py-6 text-center text-destructive">{reviewsError}</p>
             ) : productReviews.length === 0 ? (

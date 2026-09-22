@@ -2,6 +2,7 @@ import { Minus, Plus, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteCartItem, updateCartQuantity } from "@/store/shop/cart-slice";
+import { LazyImage } from "../common/lazy-image";
 
 export default function UserCartItemsContent({ cartItem }) {
   console.log(cartItem, "iiii");
@@ -30,7 +31,7 @@ export default function UserCartItemsContent({ cartItem }) {
   }
   return (
     <div className="flex items-center space-x-4">
-      <img
+      <LazyImage
         src={cartItem?.image}
         alt={cartItem?.title}
         className="w-20 h-20 rounded object-cover"

@@ -6,6 +6,7 @@ import UserCartItemsContent from "@/components/shopping-view/cart-items-content"
 import { Button } from "@/components/ui/button";
 import { createOrder } from "@/store/shop/order-slice";
 import { clearCart } from "@/store/shop/cart-slice";
+import { invalidateProductCache } from "@/store/shop/product-slice";
 
 function SHoppingCheckout() {
   const { cartItem } = useSelector((state) => state.shopCart);
@@ -65,6 +66,8 @@ function SHoppingCheckout() {
 
               if (createOrder.fulfilled.match(result)) {
                 dispatch(clearCart());
+                // Stock just changed, so cached product data is stale.
+                dispatch(invalidateProductCache());
                 const authorizationUrl = result.payload.data?.payment?.authorization_url;
                 if (authorizationUrl) {
                   window.location.assign(authorizationUrl);

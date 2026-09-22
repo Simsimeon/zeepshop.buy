@@ -17,23 +17,35 @@ import ShoppingHome from "./pages/shopping-view/home";
 import CheckAuth from "./components/common/check-auth";
 import Unauthpage from "./pages/unauth-page";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { checkAuth } from "./store/authslice";
-import { Skeleton } from "./components/ui/skeleton";
+import { PageSkeleton } from "./components/common/skeletons";
 export default function App() {
-  
-  const { isAuthenticated,user,isLoading}=useSelector(state=>state.auth)
-  console.log(isAuthenticated,user);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const [isBootstrapping, setIsBootstrapping] = useState(true);
   const dispatch = useDispatch();
-  useEffect(()=>{
-    dispatch(checkAuth())
-  },[dispatch])
-  if(isLoading)return(<Skeleton className="w-150 h-150 rounded-full">Loading.....</Skeleton>)
+
+  useEffect(() => {
+    let isActive = true;
+
+    dispatch(checkAuth()).finally(() => {
+      if (isActive) {
+        setIsBootstrapping(false);
+      }
+    });
+
+    return () => {
+      isActive = false;
+    };
+  }, [dispatch]);
+
+  
+  if (isBootstrapping) return <PageSkeleton />;
   return (
     <div className="flex flex-col overflow-hidden bg-white">
       {/* <h1>Header component</h1> */}
       <Routes>
-        <Route path="/" element={<ShoppingListing/>}/>
+        <Route path="/" element={!isAuthenticated && <ShoppingListing/>}/>
         <Route path="/auth" element={
           <CheckAuth isAuthenticated={isAuthenticated} user={user}>
           <AuthLayout/>

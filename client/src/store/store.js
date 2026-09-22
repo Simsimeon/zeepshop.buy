@@ -7,6 +7,7 @@ import shopAddressSlice from "./shop/address-slice"
 import shopOrderSlice from "./shop/order-slice"
 import searchReducer from "./search-slice"
 import reviewReducer from "./shop/review-slice"
+import heroImageReducer from "./shop/common-slice"
 const Store = configureStore({
     reducer:{
         auth:authReducer,
@@ -16,7 +17,8 @@ const Store = configureStore({
         shopAddress: shopAddressSlice,
         shopOrder: shopOrderSlice,
         search: searchReducer,
-        review: reviewReducer
+        review: reviewReducer,
+        heroImage: heroImageReducer
     }
 })
 

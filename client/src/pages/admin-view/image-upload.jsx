@@ -12,7 +12,7 @@ export function ProductImageUpload({
   setImageLoading,
   file,
   setFile,
-  uploadedImageUrl,
+  isCustomStyling=false,
   setUploadImageUrl,
 }) {
   const inputRef = useRef(null);
@@ -45,6 +45,9 @@ export function ProductImageUpload({
         const response = await axios.post(
           "http://localhost:5000/api/admin/products/upload-product-image",
           data,
+          {
+            withCredentials: true,
+          },
         );
         if (response.data.success) {
           setUploadImageUrl(response.data.result.url);
@@ -60,7 +63,7 @@ export function ProductImageUpload({
   }, [file, setUploadImageUrl, setImageLoading]);
 
   return (
-    <div className="w-full max-w-md mx-auto mt-4">
+    <div className={`w-full mt-4 ${isCustomStyling ? "":"max-w-md mx-auto"}`}>
       <Label className="text-lg  font-semibold mb-2 block">Upload Image</Label>
       <div
         onDragOver={handleDragOver}

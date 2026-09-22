@@ -23,6 +23,7 @@ import { toast } from "@/components/ui/toast";
 import SearchProduct from "@/components/shopping-view/search-product";
 import { clearSearch, searchProducts } from "@/store/search-slice";
 import { useRequireAuth } from "@/components/common/use-require-auth";
+import { ProductGridSkeleton } from "@/components/common/skeletons";
 
 function createSearchParamsHelpers(filterParams) {
   const queryParams = [];
@@ -180,9 +181,7 @@ function ShoppingListing() {
         </div>
         <div className="grid grid-cols-1 sm:grid-col-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
           {isLoading || isSearchLoading ? (
-            <p className="col-span-full text-muted-foreground">
-              {isSearchLoading ? "Searching products..." : "Loading products..."}
-            </p>
+            <ProductGridSkeleton count={8} />
           ) : searchError ? (
             <p className="col-span-full text-destructive">{searchError}</p>
           ) : displayedProducts.length > 0 ? (
