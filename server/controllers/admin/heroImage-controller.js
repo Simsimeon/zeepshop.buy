@@ -1,6 +1,8 @@
+const mongoose = require("mongoose")
 const { StatusCodes } = require("http-status-codes")
 const HeroImage = require("../../model/HeroImage")
 const { validateImageInput } = require("../../utils/validateImage")
+const { BadRequestError, NotFoundError } = require("../../errors")
 
 
 
@@ -22,5 +24,24 @@ async function getHeroImages(req,res){
     data:heroImages
   })
 }
+async function deleteHeroImages(req,res){
+  const { id: heroImageId } = req.params
 
-module.exports = { AddHeroImageInHomePage, getHeroImages }
+  if (!mongoose.isValidObjectId(heroImageId)) {
+    throw new BadRequestError("Invalid hero image id")
+  }
+
+  const heroImage = await HeroImage.findByIdAndDelete(heroImageId)
+
+  if (!heroImage) {
+    throw new NotFoundError("Hero image not found")
+  }
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Hero image deleted successfully",
+    data: heroImage
+  })
+}
+
+module.exports = { AddHeroImageInHomePage, getHeroImages,deleteHeroImages }
